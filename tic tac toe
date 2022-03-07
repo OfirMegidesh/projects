@@ -1,0 +1,356 @@
+import random
+def boardForm(board):
+    """
+    :param board: the list
+    :return: the list in the form of the bora
+    """
+    if len(board) == 3:
+        return f' {board[0][0]}|{board[0][1]}|{board[0][2]}\n _____\n {board[1][0]}|{board[1][1]}|{board[1][2]}\n _____\n {board[2][0]}|{board[2][1]}|{board[2][2]}\n==========='
+    return f' {board[0][0]}|{board[0][1]}|{board[0][2]}|{board[0][3]}\n _______\n {board[1][0]}|{board[1][1]}|{board[1][2]}|{board[1][3]}\n _______\n {board[2][0]}|{board[2][1]}|{board[2][2]}|{board[2][3]}\n _______\n {board[3][0]}|{board[3][1]}|{board[3][2]}|{board[3][3]}\n======='
+def isLegal(player, column, line):
+    """
+    challenge
+    :param player: the X or O
+    :param column: the location in the list
+    :param line: the location inside the list inside the list
+    :return: True if the location is a number in the range of the lists(including 4X4)
+    and the player typed X or O and False otherwise
+    """
+    if player.upper() == 'X' or player.upper() == 'O':
+        if len(board) != 3:
+            if column == '0' or column == '1' or column == '2' or column == '3':
+                if line == '0' or line == '1' or line == '2' or line == '3':
+                    return True
+        if column == '0' or column == '1' or column == '2':
+            if line == '0' or line == '1' or line == '2':
+                return True
+    return False
+def isAvailable(board, column, line):
+    """
+    :param board: the list
+    :param column: the location in the list
+    :param line: the location inside the list inside the list
+    :return: True if the place available and False if otherwise
+    """
+    if board[column][line] != '_':
+        return False
+    return True
+def whosTurn(player):
+    """
+    :param player: the last player's avatar
+    :return: the avatar of the current player
+    """
+    if player == 'X':
+        player = 'O'
+    else:
+        player = 'X'
+    print('the next player')
+    return player
+def playerNextMove(board, player):
+    """
+    :param board: the list
+    :param player: X or O
+    :return:the board after the move was complete
+    """
+    while True:
+        column = input(f'please enter the column (0-{len(board)-1}):')
+        line = input(f'please enter the line (0-{len(board)-1}):')
+        if isLegal(player, column, line):
+            column = int(column)
+            line = int(line)
+            if isAvailable(board, column, line):
+                board[column][line] = player
+                return (boardForm(board))
+        else:
+            print('the input was incorrect please enter again')
+            player = input('please enter your avatar:').upper()
+def isntEmpty(board):
+    """
+    the function checks if there are still moves left to do
+    :param board: the list
+    :return: True if there are moves left and False otherwise
+    """
+    e0=0
+    for i in range(len(board)):
+        if board[i].count('_') == 0:
+            e0 += 1
+    if e0 == len(board):
+        return False
+    return True
+def against1Comp():
+    """
+    the function is checking if the player want to play in a game against a computer
+    :return:True or False as the player answer.
+    """
+    while True:
+        playC = input('do you wanna play against a computer? please enter T or F')
+        if playC.lower() == 't':
+            return True
+        if playC.lower() == 'f':
+            return False
+        print('the input was incorrect')
+        continue
+def playerRandom(board):
+    """
+    challenge
+    the function is the full game of the computer against a player
+    :param board: the list
+    :return:nothing. after the turn of the computer the function printing the  list after
+    the move that was chosen randomly
+    """
+    player = input('please enter your avatar').upper()
+    while True:
+        print(boardForm(board))
+        winMove(board, player)
+        playerNextMove(board, player)
+        player = whosTurn(player)
+        column = random.randint(0, 2)
+        line = random.randint(0, 2)
+        if isAvailable(board, column, line):
+            board[column][line] = player
+            print(boardForm(board))
+        else:
+            continue
+        if gameOver(board, player):
+            return
+        player = whosTurn(player)
+def against2Comp():
+    """
+    the function is checking if the game is against two computers
+    :return: True or False as the player answer
+    """
+    while True:
+        play2C = input('is the game against two computers? please enter T or F')
+        if play2C.lower() == 't':
+            return True
+        if play2C.lower() == 'f':
+            return  False
+        print('the input was incorrect')
+        continue
+def player2Random(board):
+    """
+    the function is the game against two computers until the game is over.
+    :param board:the list
+    :return: the board after the game is over
+    """
+    player = 'X'
+    while True:
+        column = random.randint(0, 2)
+        line = random.randint(0, 2)
+        if isAvailable(board, column, line):
+            board[column][line] = player
+            print(boardForm(board))
+        else:
+            continue
+        if gameOver(board, player):
+            return
+        player = whosTurn(player)
+def wanna4X4():
+    """
+    the function is checking if the player want to play in a board of 4X4.
+    :return: True or False as the player answer.
+    """
+    while True:
+        playB = input('do you wanna play in a board of 4X4? please enter T or F')
+        if playB.lower() == 't':
+            return True
+        if playB.lower() == 'f':
+            return False
+        print('the input was incorrect')
+        continue
+def from3X3To4X4(board):
+    """
+    challenge
+    :param board: the list
+    :return: the list 4X4 instead of 3X3
+    """
+    board.append(['_', '_', '_', '_'])
+    for i in range(3):
+        board[i].append('_')
+    return boardForm(board)
+def winMoveSlants(board, player):
+    """
+    the function is checking if there is a winning move in the slants
+    :param board: the list
+    :param player: the current player
+    :return: the location of the winning move if there is one
+    """
+    if len(board) == 3:
+        isIn = 0
+        loc = ''
+        for i in range(3):
+            if board[i][i] == player:
+                isIn += 1
+            elif board[i][i] == '_':
+                loc = f'the winning move is in column {i} and line {i}'
+            if isIn == 2:
+                print(loc)
+                return True
+            isIn = 0
+            if board[2][0] == player:
+                isIn += 1
+            elif board[2][0] == '_':
+                loc = 'the winning move is in column 2 and line 0'
+            if board[1][1] == player:
+                isIn += 1
+            elif board[1][1] == '_':
+                loc = 'the winning move is in column 1 and line 1'
+            if board[0][2] == player:
+                isIn += 1
+            elif board[0][2] == '_':
+                loc = 'the winning move is in column 0 and line 2'
+            if isIn == 2:
+                print(loc)
+                return True
+    return False
+def winMoveLine(board, player):
+    """
+    the function checks if there is a winning move in the lines
+    :param board: the list
+    :param player: the current player
+    :return: the location of the winning move
+    """
+    for i in range(len(board)):
+        if board[i].count(player) == len(board) - 1:
+            for l in range(len(board)):
+                if board[i][l] != player and board[i][l] != '_':
+                    return False
+                if board[i][l] == '_':
+                    print(f'the winning move is in column {i} and in line {l}')
+                    return True
+    return False
+def winMoveColumn(board, player):
+    """
+    the function checks if there is a winning move in the column
+    :param board: the list
+    :param player: the current player
+    :return:the location of the winning move
+    """
+    for i in range(len(board)):
+        isIn = 0
+        loc = ''
+        for l in range(len(board)):
+            if board[l][i] != player and board[l][i] != '_':
+                break
+            if board[l][i] == player:
+                isIn += 1
+            if board[l][i] == '_':
+                loc = f'the winning move is in column {i} and in line {l}'
+                if isIn == len(board) - 1:
+                    print(loc)
+                    return True
+        return False
+def winMove(board, player):
+    """
+    this function checks all the board for a winning move with the help of the other winning function
+    :param board: the list
+    :param player: the current player
+    :return: the winning move location
+    """
+    if winMoveSlants(board, player):
+        return
+    if winMoveLine(board, player):
+        return
+    if winMoveColumn(board, player):
+        return
+    return False
+def gameOverSlants(board, player):
+    """
+    the function checks if there is a winner in the slants
+    :param board: the list
+    :param player: the current player
+    :return: true or false if there is a winner and print who he is
+    """
+    if len(board) == 3:
+        isIn = 0
+        for i in range(3):
+            if board[i][i] == player:
+                isIn += 1
+            else:
+                break
+            if isIn == 3:
+                print(f'the winner is {player}')
+                return True
+        if board[2][0] == player and board[1][1] == player and board[0][2] == player:
+            print(f'the winner is {player}')
+            return True
+def gameOverLine(board, player):
+    """
+    the function checks if there is a winner in the lines
+    :param board: the list
+    :param player: the current player
+    :return: true or false as if there is a winner and print who he is
+    """
+    for i in range(len(board)):
+        if board[i].count(player) == len(board):
+            print(f'the winner is {player}')
+            return True
+    return False
+def gamOverColumn(board, player):
+    """
+    the function checks if there is a winner in the column
+    :param board: the list
+    :param player: the current player
+    :return: true or false as if there is a winner and print who he is
+    """
+    for i in range(len(board)):
+        isIn = 0
+        for l in range(len(board)):
+            if board[l][i] != player and board[l][i] != '_':
+                return False
+            if board[l][i] == player:
+                isIn += 1
+            if isIn == len(board):
+                print(f'the winner is {player}')
+                return True
+def gameOver(board, player):
+    """
+    the function checks if the game is over with the help of the gameOver functions and isntEmpty
+    :param board: the list
+    :param player: the current player
+    :return: True if the game is over and False otherwise.
+    Also, the function printing a message who won.
+    """
+    if gamOverColumn(board, player):
+        return True
+    if gameOverLine(board, player):
+        return True
+    if gameOverSlants(board, player):
+        return True
+    if isntEmpty(board):
+        return False
+    print('the game is over with a tie')
+    return True
+def quitGame():
+    """
+    the function is checking if the players want to quit the game
+    :return: True or False as the answer of the player.
+    """
+    quit = input('if you want to quit enter Q')
+    if quit.lower() == 'q':
+        return True
+    else:
+        return False
+while True:
+    if quitGame(): # if the players want to end the game
+        break
+    board = [['_', '_', '_'], ['_', '_', '_'], ['_', '_', '_']]
+    print(boardForm(board))
+    if wanna4X4(): # if the game will be 3X3 or 4X4.
+        from3X3To4X4(board)
+    if against2Comp(): # if the game will be 2 computers
+        player2Random(board)
+        continue
+    if against1Comp(): # if the game will be against a computer
+        playerRandom(board)
+        break
+    player = input('please enter your avatar:').upper()
+    while isntEmpty(board):
+        print(boardForm(board))
+        winMove(board, player)
+        print('please enter your move')
+        playerNextMove(board, player)
+        if gameOver(board, player):
+            print(boardForm(board))
+            break
+        player = whosTurn(player)
